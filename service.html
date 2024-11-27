@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trung tâm dịch vụ</title>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <h1 style="text-align: center; background: #0078D7; color: white; padding: 15px 0;">Trung tâm Dịch vụ</h1>
+        </nav>
+    </header>
+    <div id="map"></div>
+    
+    <script>
+        // Tọa độ các trung tâm
+        const centers = [
+            { name: "Trung tâm Hà Nội", lat: 21.028511, lng: 105.804817 },
+            { name: "Trung tâm TP.HCM", lat: 10.823099, lng: 106.629662 },
+            { name: "Trung tâm Đà Nẵng", lat: 16.054407, lng: 108.202167 }
+        ];
+
+        // Khởi tạo bản đồ Leaflet
+        const map = L.map('map').setView([21.028511, 105.804817], 6);
+
+        // Thêm tile layer từ API
+        const tileLayerUrl = "https://api.vdtdata.com/gis/ozbasemap/{z}/{x}/{y}.pbf?apikey=sAYcr5fym2WWFcOllvWstM0o1UQkU0RM";
+        L.tileLayer(tileLayerUrl, {
+            attribution: "Bản đồ từ VDT Data",
+            maxZoom: 18
+        }).addTo(map);
+
+        // Thêm các điểm đánh dấu trung tâm vào bản đồ
+        centers.forEach(center => {
+            const marker = L.marker([center.lat, center.lng]).addTo(map);
+            marker.bindPopup(`<b>${center.name}</b>`).openPopup();
+        });
+    </script>
+</body>
+</html>
