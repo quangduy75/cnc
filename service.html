@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trung tâm dịch vụ</title>
+    <!-- Link Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         body, html {
             margin: 0;
@@ -14,27 +16,58 @@
             height: 90vh;
             width: 100%;
         }
+        /* Tùy chỉnh nút trong InfoWindow */
+        .info-button {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .info-button:hover {
+            background-color: #005bb5;
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav style="background: #0078D7; padding: 10px;">
-        <ul style="list-style: none; margin: 0; padding: 0; display: flex; justify-content: space-around; color: white;">
-            <li><a href="index.html" style="color: white; text-decoration: none;">Trang chủ</a></li>
-            <li><a href="control.html" style="color: white; text-decoration: none;">Điều khiển</a></li>
-            <li><a href="service.html" style="color: white; text-decoration: none;">Trung tâm dịch vụ</a></li>
-            <li><a href="index.html#gioi-thieu" style="color: white; text-decoration: none;">Giới thiệu</a></li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">CNC Control</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="control.html">Điều khiển</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="service.html">Trung tâm dịch vụ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#gioi-thieu">Giới thiệu</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
 
     <!-- Map Container -->
     <div id="map"></div>
 
     <!-- Footer -->
-    <footer style="background: #333; color: white; text-align: center; padding: 10px;">
+    <footer class="bg-dark text-white text-center p-3">
         <p>© 2024 Nguyễn Ánh Thụy. All rights reserved.</p>
     </footer>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Google Maps JavaScript API -->
     <script>
         // Tọa độ các trung tâm
@@ -44,13 +77,20 @@
             { name: "Trung tâm Đà Nẵng", lat: 16.054407, lng: 108.202167 }
         ];
 
-        // Hàm khởi tạo Google Maps
         function initMap() {
             // Khởi tạo bản đồ
             const map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 21.028511, lng: 105.804817 },
+                center: { lat: 15.0, lng: 105.0 },
                 zoom: 6,
             });
+
+            // Biểu tượng cell pin cho marker
+            const cellPinIcon = {
+                url: "cell_pin.png", // Thay bằng đường dẫn đến hình ảnh cell pin của bạn
+                scaledSize: new google.maps.Size(32, 32), // Kích thước biểu tượng
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(16, 32)
+            };
 
             // Thêm các điểm đánh dấu trung tâm
             centers.forEach(center => {
@@ -58,17 +98,43 @@
                     position: { lat: center.lat, lng: center.lng },
                     map: map,
                     title: center.name,
+                    icon: cellPinIcon
                 });
 
-                // Thêm popup khi click vào marker
+                // Nội dung InfoWindow với nút "Dẫn đường"
+                const infoWindowContent = `
+                    <div>
+                        <b>${center.name}</b><br><br>
+                        <button class="info-button" onclick="getDirections(${center.lat}, ${center.lng})">Dẫn đường</button>
+                    </div>
+                `;
+
                 const infoWindow = new google.maps.InfoWindow({
-                    content: `<b>${center.name}</b>`,
+                    content: infoWindowContent,
                 });
 
                 marker.addListener("click", () => {
                     infoWindow.open(map, marker);
                 });
             });
+        }
+
+        // Hàm mở Google Maps chỉ đường đến vị trí trung tâm
+        function getDirections(lat, lng) {
+            // Lấy vị trí hiện tại của người dùng
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const currentLat = position.coords.latitude;
+                    const currentLng = position.coords.longitude;
+                    // Tạo URL để mở Google Maps với chỉ đường
+                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${currentLat},${currentLng}&destination=${lat},${lng}&travelmode=driving`;
+                    window.open(directionsUrl, '_blank');
+                }, () => {
+                    alert("Không thể lấy vị trí hiện tại.");
+                });
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ Geolocation.");
+            }
         }
     </script>
 
